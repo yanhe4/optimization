@@ -405,14 +405,18 @@ class GPU_Graph
 public:
      // construct a vector of vectors to represent each edge index and its inward edges (hot data)
      std::vector<std::vector<int> > adjEdges;
-     // Store the number of ingoing edges.
+
+     // Store the number of inward edges of each node.
      std::vector<int> ingoing_edges_num;
-     // Store every node's begin index, which is likely a pointer to the index of node.
+     // Store every node's begin index
+     // It is likely a pointer to the index of node.
      std::vector<int> beginIndex;
-     // Store the inward edges in 1-D array, the size of which is the same as the number of links.
-     // (1-D array version of adjEdges). 
+     // Store the inward edges in 1-D array(1-D array version of adjEdges). 
+     // The size of which is the same as the number of links.
      int* adjE; 
+     // Total number of edgeds
      int num_edges;
+
      // construct a data structure to store hot data arrays
      HotData hotData;
 
@@ -457,7 +461,7 @@ public:
             std::cout<<" Num of ingoing edges at " << i << " is "<< ingoing_edges_num[i]
                      <<" index begins at " << beginIndex[i] << " neighbors: \n";
             int index = beginIndex[i];
-            for(unsigned j = 0; j < ingoing_edges_num[i]; ++j){
+            for(int j = 0; j < ingoing_edges_num[i]; ++j){
                std::cout<<adjE[index + j]<<" ";
             }
             std::cout<<'\n';

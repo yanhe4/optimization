@@ -7,6 +7,7 @@
 #include <vector>
 #include <chrono>
 #include <ctime>
+#include <omp.h>
 #include "Graph.hpp"
 
 #define CheckTolerance 0
@@ -44,6 +45,7 @@ bool ToleranceCheck(const unsigned& num_v, HotData& hotData)
 {
     // Sum up the pagerank
     double pr_sum = 0.0;
+    #pragma omp parallel for reduction(+:pr_sum)
     for (unsigned i = 0; i < num_v; i++) 
     {
         pr_sum += hotData.pagerank[i];
@@ -51,6 +53,7 @@ bool ToleranceCheck(const unsigned& num_v, HotData& hotData)
     // Calculate the cur_toleranceor
     pr_sum = 1.0 / pr_sum;
     double cur_tolerance = 0.0;
+
     for (unsigned i = 0; i < num_v; i++)
     {
         hotData.pagerank[i] *= pr_sum;
@@ -71,6 +74,7 @@ void PageRank(SoA_Graph *graph)
     double init_rank = double(1.0 / num_v);
     double pr_random = (1.0 - damping_factor) / num_v;
 
+    #pragma omp parallel for
     for (unsigned i = 0; i < num_v; i++)
     {
         graph->hotData.pagerank[i] = init_rank;
@@ -82,18 +86,20 @@ void PageRank(SoA_Graph *graph)
     {
         double dangling_pr_sum = 0.0;
         // Update the pagerank values in every iteration
+        #pragma omp parallel for reduction(+:dangling_pr_sum)
         for (unsigned i = 0; i < num_v; i++)
         {
             graph->hotData.pre_pagerank[i] = graph->hotData.pagerank[i];
             graph->hotData.pagerank[i] = 0.0;
-            //removed branch prediction
-            dangling_pr_sum += graph->hotData.pre_pagerank[i] * (graph->hotData.outgoing_edges_num[i] == 0);
+            dangling_pr_sum += graph->hotData.pre_pagerank[i] * 
+                            (graph->hotData.outgoing_edges_num[i] == 0);
         }
 
         double pr_dangling = damping_factor * dangling_pr_sum / num_v;
 
         // Iterater all the vertexes and calculate its adjacency function l(pi,pj) of all inward links
         // Update its pagerank value by adding pr_eigenvector from its inward links separately
+        #pragma omp parallel for
         for (unsigned i = 0; i < num_v; i++)
         {
             unsigned inward_edges_num = graph->adjEdges[i].size();
@@ -106,6 +112,7 @@ void PageRank(SoA_Graph *graph)
                                         / graph->hotData.outgoing_edges_num[inward_edge_index];
                 graph->hotData.pagerank[i] += pr_eigenvector;
             }
+            // #pragma omp atomic
             graph->hotData.pagerank[i] += (pr_random + pr_dangling);
         }
 
@@ -139,11 +146,13 @@ void PrintBenchmark(std::chrono::time_point<std::chrono::steady_clock> start_t, 
 
 int main(int argc, char *argv[])
 {
-    if(argc == 3)
+    unsigned loop_times = 10;
+    unsigned num_vertices = 0;
+    if(argc >= 4)
     {
-        unsigned loop_times = 10;
-        unsigned num_vertices = 0;
         const char* test_mode = argv[2];
+        omp_set_num_threads( atoi( argv[ 3 ] ) );
+        std::cout << "The number of threads used: " << omp_get_max_threads() << std::endl;
 
         ColdEdge input = ReadInputFromTextFile(argv[1], num_vertices);
 
@@ -183,14 +192,30 @@ int main(int argc, char *argv[])
         else
         {
             std::cout << "Invalid Input!" << std::endl;
+            std::cout << "Please input the input text file name wanted in argc[1]" << std::endl;
+            std::cout << "Please input the time mode(total/graph/pangerank) to be record in argc[2]" << std::endl;
+            std::cout << "Please input the number of threads wanted to use in argc[3]" << std::endl;
         }
+    }
+    else if (argc >= 2 && argc < 4)
+    {
+        ColdEdge input = ReadInputFromTextFile(argv[1], num_vertices);
+        std::cout << "The number of threads used: " << omp_get_max_threads() << std::endl;
+        auto const start_time = std::chrono::steady_clock::now();
+        for (unsigned i = 0; i < loop_times; i++)
+        {
+            SoA_Graph graph(num_vertices, input);
+            PageRank(&graph);
+        }  
+        auto const end_time = std::chrono::steady_clock::now(); 
+        PrintBenchmark(start_time, end_time, loop_times);
     }
     else
     {
         std::cout << "Invalid Input: " << std::endl;
         std::cout << "Please input the input text file name wanted in argc[1]" << std::endl;
         std::cout << "Please input the time mode(total/graph/pangerank) to be record in argc[2]" << std::endl;
+        std::cout << "Please input the number of threads wanted to use in argc[3]" << std::endl;
     }
-
     return 0;
 }
