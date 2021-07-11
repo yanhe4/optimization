@@ -37,6 +37,7 @@ int main(int argc, char *argv[])
       int num_vertices = atoi(argv[1]);
       num_edges = atoi(argv[2]);
       // matrix to store flags of edges(already exist/empty), so that we can avoid repeating edges
+      // create a size of num_vertices * num_vertices matrix, where all the values r 0
       std::vector<std::vector<char> > matrix(num_vertices, std::vector<char>(num_vertices, 0));
       while (cur_edges < num_edges)
       {
