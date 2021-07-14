@@ -33,6 +33,9 @@ int main(int argc, char *argv[])
 {
    if (argc == 3)
    {
+      std::ofstream inputFile;
+      inputFile.open("input.txt");
+
       int num_edges = 0, cur_edges = 0;
       int num_vertices = atoi(argv[1]);
       num_edges = atoi(argv[2]);
@@ -58,9 +61,11 @@ int main(int argc, char *argv[])
          {
             matrix[x][y] = 1;
             ++cur_edges;
-            std::cout << x << " " << y << '\n';
+            inputFile << x << " " << y << '\n';
+            // std::cout << x << " " << y << '\n';
          }
       }
+      inputFile.close();
    }
    else
    {
