@@ -57,7 +57,7 @@ bool ToleranceCheck(const unsigned &num_v, Graph *graph)
     }
     if (cur_tolerance < tolerance)
     {
-        std::cout << "Current toleranceor: " << cur_tolerance << std::endl;
+        // std::cout << "Current toleranceor: " << cur_tolerance << std::endl;
         return true;
     }
     return false;
@@ -116,7 +116,7 @@ void PageRank(Graph *graph)
         // finish when cur_toleranceor is smaller than tolerance we set
         if (ToleranceCheck(num_v, graph))
         {
-            std::cout << "Iteration time: " << iter << std::endl;
+            // std::cout << "Iteration time: " << iter << std::endl;
             break;
         }
     }
