@@ -9,7 +9,7 @@
 #include <ctime>
 #include "Graph.hpp"
 
-using namespace CSC586C::optimize_graph;
+using namespace optPagerank::optimize_graph;
 
 extern const double damping_factor = 0.85;
 extern const unsigned max_iterations = 100;

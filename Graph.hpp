@@ -3,7 +3,7 @@
 #include <vector>
 #include <list>
 
-namespace CSC586C {
+namespace optPagerank {
 
 // The first edition of data structure
 // Baseline_graph with AoS and use std::vector<Vertex*> to store the edges and their relationships
@@ -510,4 +510,4 @@ private:
 } // End of namespace gpu_graph
 
 
-} // End of namespace CSC586C
+} // End of namespace optPageRank

@@ -14,7 +14,7 @@
 
 #define GPU 1
 
-using namespace CSC586C::gpu_graph;
+using namespace optPagerank::gpu_graph;
 
 extern const double damping_factor = 0.85;
 extern const unsigned max_iterations = 100;

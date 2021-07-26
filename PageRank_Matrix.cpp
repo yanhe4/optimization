@@ -10,7 +10,7 @@
 #include "Graph.hpp"
 #include <algorithm>
 
-using namespace CSC586C::optimize_matrix;
+using namespace optPagerank::optimize_matrix;
 
 extern const double damping_factor = 0.85;
 extern const unsigned max_iterations = 100;
