@@ -121,12 +121,16 @@ void PageRank(SoA_Graph *graph)
 
 void printFinalResults(SoA_Graph *graph)
 {
-    std::cout << "PageRank values: \n";
+    std::ofstream inputFile;
+    inputFile.open("output_baseline.txt");
+
+    inputFile << "PageRank values: \n";
     for (unsigned i = 0; i < graph->VertexesNum(); ++i)
     {
-        std::cout << "The index is: " << i << " with value " << graph->hotData.pagerank[i] << '\n';
+        inputFile << "The index is: " << i << " with value " << graph->hotData.pagerank[i] << '\n';
     }
-    std::cout << '\n';
+    inputFile << '\n';
+    inputFile.close();
 }
 
 void PrintBenchmark(std::chrono::time_point<std::chrono::steady_clock> start_t, std::chrono::time_point<std::chrono::steady_clock> const end_t, const unsigned loop_t)
@@ -153,7 +157,7 @@ int main(int argc, char *argv[])
             {
                 SoA_Graph graph(num_vertices, input);
                 PageRank(&graph);
-                //printFinalResults(&graph);
+                printFinalResults(&graph);
             }
             auto const end_time = std::chrono::steady_clock::now();
             PrintBenchmark(start_time, end_time, loop_times);
